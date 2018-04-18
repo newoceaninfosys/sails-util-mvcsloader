@@ -1,15 +1,77 @@
 {
-  "name": "sails-util-mvcsloader",
-  "version": "0.4.0",
+  "_args": [
+    [
+      {
+        "raw": "sails-util-mvcsloader@^0.3.0",
+        "scope": null,
+        "escapedName": "sails-util-mvcsloader",
+        "name": "sails-util-mvcsloader",
+        "rawSpec": "^0.3.0",
+        "spec": ">=0.3.0 <0.4.0",
+        "type": "range"
+      },
+      "/home/bigbn/Projects/web-panel/site"
+    ]
+  ],
+  "_from": "sails-util-mvcsloader@>=0.3.0 <0.4.0",
+  "_id": "sails-util-mvcsloader@0.3.2",
+  "_inCache": true,
+  "_location": "/sails-util-mvcsloader",
+  "_nodeVersion": "4.1.0",
+  "_npmUser": {
+    "name": "leeroy",
+    "email": "leeroy.brun@gmail.com"
+  },
+  "_npmVersion": "2.14.3",
+  "_phantomChildren": {},
+  "_requested": {
+    "raw": "sails-util-mvcsloader@^0.3.0",
+    "scope": null,
+    "escapedName": "sails-util-mvcsloader",
+    "name": "sails-util-mvcsloader",
+    "rawSpec": "^0.3.0",
+    "spec": ">=0.3.0 <0.4.0",
+    "type": "range"
+  },
+  "_requiredBy": [
+    "/"
+  ],
+  "_resolved": "https://registry.npmjs.org/sails-util-mvcsloader/-/sails-util-mvcsloader-0.3.2.tgz",
+  "_shasum": "54c643221291d7cc65ce66ff59121bbe70100b5a",
+  "_shrinkwrap": null,
+  "_spec": "sails-util-mvcsloader@^0.3.0",
+  "_where": "/home/bigbn/Projects/web-panel/site",
+  "author": {
+    "name": "Leeroy Brun, Aumard Jimmy"
+  },
+  "bugs": {
+    "url": "https://github.com/leeroybrun/sails-util-mvcsloader/issues"
+  },
+  "contributors": [
+    {
+      "name": "Leeroy Brun",
+      "email": "leeroy.brun@gmail.com"
+    },
+    {
+      "name": "Aumard Jimmy"
+    }
+  ],
+  "dependencies": {
+    "async": "^0.9.0",
+    "include-all": "^0.1.6",
+    "lodash": "^3.5.0",
+    "sails-build-dictionary": "^0.10.1",
+    "sails-util": "^0.10.6"
+  },
   "description": "Load models, controllers, services, policies and config from specified directories and inject them into the main Sails app.",
-  "main": "index.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+  "devDependencies": {},
+  "directories": {},
+  "dist": {
+    "shasum": "54c643221291d7cc65ce66ff59121bbe70100b5a",
+    "tarball": "https://registry.npmjs.org/sails-util-mvcsloader/-/sails-util-mvcsloader-0.3.2.tgz"
   },
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/leeroybrun/sails-util-mvcsloader"
-  },
+  "gitHead": "80fccea345cba8ea1c1e77449514e5af15f31e6c",
+  "homepage": "https://github.com/leeroybrun/sails-util-mvcsloader",
   "keywords": [
     "sails hook loader",
     "sails plugins system",
@@ -30,26 +92,28 @@
     "config",
     "policies"
   ],
-  "author": "Leeroy Brun, Aumard Jimmy",
-  "contributors": [
+  "license": "MIT",
+  "main": "index.js",
+  "maintainers": [
     {
-      "name": "Leeroy Brun",
-      "email": "leeroy.brun@gmail.com"
+      "name": "jaumard",
+      "email": "jimmy.aumard@gmail.com"
     },
     {
-      "name": "Aumard Jimmy"
+      "name": "leeroy",
+      "email": "leeroy.brun@gmail.com"
     }
   ],
-  "license": "MIT",
-  "bugs": {
-    "url": "https://github.com/leeroybrun/sails-util-mvcsloader/issues"
+  "name": "sails-util-mvcsloader",
+  "optionalDependencies": {},
+  "readme": "# sails-util-mvcsloader\n\n[![NPM](https://nodei.co/npm/sails-util-mvcsloader.png?downloads=true&downloadRank=true&stars=true)](https://nodei.co/npm/sails-util-mvcsloader/)\n\nLoad models, controllers, services, policies and config from specified directories and inject them into the main Sails app.\n\nThis is partically usefull to extend your Sails app from hooks.\n\nYou can have create new models/controllers/etc in your hook, and have them loaded into the main Sails app.  \nYou can even extend models/controllers/etc already existing in your main Sails app with specific methods/properties from your hooks.\n\n## Installation\n\nYou have to install it in the project from where you will load the models/controllers/etc.\n\nIf you want to load MVCS from a hook in your main Sails' app (living in the hooks/ folder), install it in your Sails app's main folder.\n\nIf you want to load MVCS from an installable hook (separate NPM package), install it directly in your installable hook's main folder.\n\nRun this command to install and add the package as a dependency in your package.json :\n\n```\nnpm install --save sails-util-mvcsloader\n```\n\n## How to use it\n\nYou can find a complete hook example in the [example folder](https://github.com/jaumard/sails-util-mvcsloader/tree/master/example/sails-hook-echo).\n\nUsing this module is pretty easy.\n\nIn your hook's index.js file, require the module and pass your Sails app as first argument :\n\n    module.exports = function(sails) {\n        var loader = require('sails-util-mvcsloader')(sails);\n\n        ...\n\n        return {\n            initialize: function (next) {\n                ...\n            }\n        };\n    };\n\n\n### Loading config / policies\n\nYou can load config and policies with the `configure` method.  \nThis method is synchronous and MUST be called before the hook initialisation, outside the initialize method.  \nIf you don't want/need to load config or policies, you don't have to call this method.\n\nUse it like this (complete example below):\n\n    // Load policies under ./api/policies and config under ./config\n    loader.configure();\n\nOr like this if you want to load from specific directories:\n\n    loader.configure({\n        policies: __dirname + '/api/policies',// Path to the policies to load\n        config: __dirname + '/config' // Path to the config to load\n    });\n\n\n### Loading models / controllers / services\n\nTo load models, controllers and services, call the `inject` method.  \nThis method is asynchronous and must be called after the `configure` method (presented above), if you need to load config and policies.\n\nUse it like this (complete example below):\n\n    /*\n        Load models under ./api/models\n        Load controllers under ./api/controllers\n        Load services under ./api/services\n    */\n    loader.inject(function (err) {\n        return next(err);\n    });\n\nOr like this if you want to load from specific directories:\n\n    loader.adapt({\n        controllers: __dirname + '/controllers', // Path to the controllers to load\n        models: __dirname + '/models', // Path to the models to load\n        services: __dirname + '/services' // Path to the services to load\n    }, function (err) {\n        return next(err);\n    });\n \n\n### Complete example\n\nHere is a complete example. It's the index.js file of a Sails hook.\n\n    module.exports = function(sails) {\n        var loader = require('sails-util-mvcsloader')(sails);\n\n        // Load policies under ./api/policies and config under ./config\n        loader.configure();\n    \n        /*\n            OR if you want to set a custom path :\n\n            loader.configure({\n                policies: __dirname + '/api/policies',// Path to your hook's policies\n                config: __dirname + '/config'// Path to your hook's config\n            });\n         */\n    \n        return {\n            initialize: function (next) {\n                /*\n                    Load models under ./api/models\n                    Load controllers under ./api/controllers\n                    Load services under ./api/services\n                */\n                loader.inject(function (err) {\n                    return next(err);\n                });\n    \n                /*\n                    OR if you want to set a custom path :\n\n                    loader.inject({\n                        controllers: __dirname + '/controllers', // Path to your hook's controllers\n                        models: __dirname + '/models', // Path to your hook's models\n                        services: __dirname + '/services' // Path to your hook's services\n                    }, function (err) {\n                        return next(err);\n                    });\n                 */\n            }\n        };\n    }\n\n\n## Used by\n[sails-hook-passport](https://github.com/jaumard/sails-hook-passport)\n\n## Development\n\n### Contributing\n\nFor now, we use 4 spaces instead of 2.  \nFor the rest, please follow the [Felix's Node.js Style Guide](https://github.com/felixge/node-style-guide).\n\nWe use [semantic versioning](https://docs.npmjs.com/getting-started/semantic-versioning) for the NPM package.\n\n### Contributors\n\n- [Leeroy Brun](https://github.com/leeroybrun)\n- [Jimmy Aumard](https://github.com/jaumard)\n\n### TODO\n- Add support for loading :\n    - Views\n    - Assets\n- Add tests\n- Add Grunt for auto-JSHint & tests",
+  "readmeFilename": "README.md",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/leeroybrun/sails-util-mvcsloader.git"
   },
-  "homepage": "https://github.com/leeroybrun/sails-util-mvcsloader",
-  "dependencies": {
-    "async": "^0.9.0",
-    "include-all": "^0.1.6",
-    "lodash": "^3.5.0",
-    "sails-build-dictionary": "^0.10.1",
-    "sails-util": "^0.10.6"
-  }
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "version": "0.3.2"
 }
