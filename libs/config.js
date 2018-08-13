@@ -13,6 +13,10 @@ module.exports = function (sails, dir) {
   }, function (err, configs) {
     if (err) sails.log.error(err)
     sails.config = _.merge(configs, sails.config, (a, b) => _.isArray(a) ? a.concat(b) : undefined)
+
+    // Using this hack to reset and bind our policies to router
+    sails._actionMiddleware = []
+    sails.router.flush()
   })
 }
 
