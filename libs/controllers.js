@@ -27,7 +27,7 @@ module.exports = function (sails, dir, cb) {
         // Register controllers on the main "controllers" hook
     function registerControllers (modules, next) {
             // Extends sails.controllers with new ones
-      sails.controllers = _.merge(modules || {}, sails.controllers || {})
+      sails.controllers = {...modules, ...sails.controllers}
 
             // Loop through each controllers and register them
       _.each(modules, function (controller, controllerId) {
