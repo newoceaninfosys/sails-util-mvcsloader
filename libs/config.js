@@ -9,8 +9,7 @@ module.exports = function (sails, dir) {
         dirname: dir,
         exclude: ['locales', 'local.js', 'local.json', 'local.coffee', 'local.litcoffee'],
         excludeDirs: /(locales|env)$/,
-        filter: /(.+)\.(js|json|coffee|litcoffee)$/,
-        identity: false
+        filter: /(.+)\.(js|json|coffee|litcoffee)$/
     }, function (err, configs) {
         sails.config = _.merge(configs, sails.config, function (a, b) {
             if (_.isArray(a)) {
