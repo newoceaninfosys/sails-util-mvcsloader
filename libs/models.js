@@ -23,7 +23,13 @@ module.exports = function (sails, dir, cb) {
       if (err) return cb(err)
       let finalModels = {...models, supplements} || {}
       sails.models = {...finalModels, ...sails.models}
-
+      if (sails.config.globals.models === true) {
+        for (let modelName in models) {
+          let model = models[modelName]
+          let globalId = model.globalId
+          global[globalId] = model
+        }
+      }
       cb()
     })
   })
