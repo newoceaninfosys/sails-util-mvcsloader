@@ -2,35 +2,55 @@
  * Load models from a directory into a Sails app
  */
 
-var buildDictionary = require('sails-build-dictionary')
+const util = require('./utils');
+const colors = require('colors');
+const includeAll = require('include-all');
 
 module.exports = function (sails, dir, cb) {
-  buildDictionary.optional({
-    dirname: dir,
-    filter: /^([^.]+)\.(js|coffee|litcoffee)$/,
-    replaceExpr: /^.*\//,
-    flattenDirectories: true
-  }, (err, models) => {
-    if (err) return cb(err)
 
-        // Get any supplemental files
-    buildDictionary.optional({
-      dirname: dir,
-      filter: /(.+)\.attributes.json$/,
-      replaceExpr: /^.*\//,
-      flattenDirectories: true
-    }, (err, supplements) => {
-      if (err) return cb(err)
-      let finalModels = {...models, supplements} || {}
-      sails.models = {...finalModels, ...sails.models}
-      if (sails.config.globals.models === true) {
-        for (let modelName in models) {
-          let model = models[modelName]
-          let globalId = model.globalId
-          global[globalId] = model
-        }
-      }
-      cb()
-    })
-  })
+  // Get the main model files
+  // includeAll.optional({
+  //   dirname   : dir,
+  //   filter    : /^(.+)\.(?:(?!md|txt).)+$/,
+  //   replaceExpr : /^.*\//,
+  //   flatten: true
+  // }, function(err, models) {
+  //   if (err) { return cb(err); }
+  //
+  //   // ---------------------------------------------------------
+  //   // Get any supplemental files (BACKWARDS-COMPAT.)
+  //   includeAll.optional({
+  //     dirname   : dir,
+  //     filter    : /(.+)\.attributes.json$/,
+  //     replaceExpr : /^.*\//,
+  //     flatten: true
+  //   }, util.bindToSails(function(err, supplements) {
+  //     if (err) {
+  //       console.log(colors.red('Failed to load plugin\'s models'));
+  //       console.log(err);
+  //       return cb(err);
+  //     }
+  //
+  //     if (_.keys(supplements).length > 0) {
+  //       sails.log.debug('The use of `.attributes.json` files is deprecated, and support will be removed in a future release of Sails.');
+  //     }
+  //
+  //     const modelDefs = _.merge(models, supplements)
+  //
+  //     // Update the dictionary of models stored on our hook (`sails.hooks.orm.models`).
+  //     // Note that the reference on the app instance (`sails.models`) is just an alias of this.
+  //     _.extend(hook.models, modelDefs);
+  //
+  //     // Loop through models and coerce `connection` to `datastore` with a warning.
+  //     _.each(hook.models, function(modelDef, modelIdentity) {
+  //       if (modelDef.connection) {
+  //         sails.log.debug('In model `' + modelIdentity + '`: the `connection` setting is deprecated.  Please use `datastore` instead.\n');
+  //         modelDef.datastore = modelDef.connection;
+  //       }
+  //     });
+  //
+  //     return cb();
+  //   }));
+  //   // ---------------------------------------------------------
+  // });
 }

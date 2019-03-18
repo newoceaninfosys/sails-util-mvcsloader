@@ -9,8 +9,8 @@ module.exports = function (sails) {
 
     defaults: {},
 
-    injectPolicies: function (dir) {
-      require(__dirname + '/libs/policies')(sails, dir)
+    injectPolicies: function (dir, loadPoliciesCallBack) {
+      require(__dirname + '/libs/policies')(sails, dir, loadPoliciesCallBack)
     },
     injectConfig: function (dir) {
       require(__dirname + '/libs/config')(sails, dir)
@@ -28,19 +28,23 @@ module.exports = function (sails) {
       require(__dirname + '/libs/services')(sails, dir, cb)
     },
 
+    injectHelpers: function (dir, cb) {
+      require(__dirname + '/libs/helpers')(sails, dir, cb)
+    },
+
         // Inject config and policies synchronously into the Sails app
-    configure: function (dir) {
+    configure: function (dir, loadPoliciesCallBack) {
       if (!dir) {
         dir = {
           config: __dirname + '/../../config',
           policies: __dirname + '/../../api/policies'
         }
       }
-      this.injectAll(dir)
+      this.injectAll(dir, null, loadPoliciesCallBack)
     },
 
         // Inject models, controllers & services asynchronously into the Sails app
-    inject: function (dir, next) {
+    inject: function (dir, next, loadPoliciesCallBack) {
             // No parameters or only a callback (function) as first parameter
       if ((typeof dir === 'function' || !dir) && !next) {
         let tmp = next
@@ -48,7 +52,8 @@ module.exports = function (sails) {
         dir = tmp || {
           models: __dirname + '/../../api/models',
           controllers: __dirname + '/../../api/controllers',
-          services: __dirname + '/../../api/services'
+          services: __dirname + '/../../api/services',
+          helpers: __dirname + '/../../api/helpers'
         }
       }
 
@@ -62,10 +67,10 @@ module.exports = function (sails) {
             // Be sure to have a callback
       next = next || function () {}
 
-      this.injectAll(dir, next)
+      this.injectAll(dir, next, loadPoliciesCallBack)
     },
 
-    injectAll: function (dir, cb) {
+    injectAll: function (dir, cb, loadPoliciesCallBack) {
       cb = cb || function () {}
 
       let self = this
@@ -102,8 +107,18 @@ module.exports = function (sails) {
         })
       }
 
+      let loadHelpers = function (next) {
+        self.injectHelpers(dir.helpers, function (err) {
+          if (err) {
+            return next(err)
+          }
+          sails.log.info('User hook helpers loaded from ' + dir.helpers + '.')
+          return next(null)
+        })
+      }
+
       if (dir.policies) {
-        self.injectPolicies(dir.policies)
+        self.injectPolicies(dir.policies, loadPoliciesCallBack)
         sails.log.info('User hook policies loaded from ' + dir.policies + '.')
       }
 
@@ -124,6 +139,10 @@ module.exports = function (sails) {
 
       if (dir.services) {
         toLoad.push(loadServices)
+      }
+
+      if (dir.helpers) {
+        toLoad.push(loadHelpers)
       }
 
       async.parallel(toLoad, function (err) {
