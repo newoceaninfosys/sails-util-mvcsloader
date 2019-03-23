@@ -39,7 +39,6 @@ module.exports = function(sails, dir, cb) {
     // Save final config into sails.config
     sails.config = config;
 
-    console.log("sails.config.policies", sails.config.policies);
 
     cb(null);
   });

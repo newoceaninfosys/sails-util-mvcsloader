@@ -32,6 +32,10 @@ module.exports = function(sails) {
       require(__dirname + "/libs/helpers")(sails, dir, cb);
     },
 
+    injectViews: function(dir, cb) {
+      require(__dirname + "/libs/views")(sails, dir, cb);
+    },
+
     // Inject config and policies synchronously into the Sails app
     configure: function(dir, cb, loadPoliciesCallBack) {
       if (!dir) {
@@ -94,7 +98,7 @@ module.exports = function(sails) {
             return next(err);
           }
 
-          sails.log.info("User hook controllers loaded from " + dir.models + ".");
+          sails.log.info("User hook controllers loaded from " + dir.controllers + ".");
 
           return next(null);
         });
@@ -147,6 +151,16 @@ module.exports = function(sails) {
         };
       }
 
+      let loadViews = function(next) {
+        self.injectViews(dir.views, function(err) {
+          if (err) {
+            return next(err);
+          }
+          sails.log.info("User hook views loaded from " + dir.views + ".");
+          return next(null);
+        });
+      };
+
       let toLoad = [];
 
       if (dir.config) {
@@ -171,6 +185,10 @@ module.exports = function(sails) {
 
       if (dir.helpers) {
         toLoad.push(loadHelpers);
+      }
+
+      if (dir.views) {
+        toLoad.push(loadViews);
       }
 
       async.parallel(toLoad, function(err) {
