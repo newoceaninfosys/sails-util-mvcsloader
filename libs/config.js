@@ -2,24 +2,24 @@
  * Load config from a directory into a Sails app
  */
 
-const includeAll = require('include-all');
-const _ = require('lodash');
-const colors = require('colors');
-const mergeDictionaries = require('merge-dictionaries');
+const includeAll = require("include-all");
+const _ = require("lodash");
+const colors = require("colors");
+const mergeDictionaries = require("merge-dictionaries");
 
-module.exports = function (sails, dir) {
+module.exports = function(sails, dir, cb) {
   includeAll.aggregate({
-    dirname   : dir,
-    exclude   : ['locales', /local\..+/],
+    dirname: dir,
+    exclude: ["locales", /local\..+/],
     excludeDirs: /(locales|env)$/,
-    flatten   : true,
+    flatten: true,
     keepDirectoryPath: true,
-    identity  : false
-  }, function (err, userConfig) {
+    identity: false
+  }, function(err, userConfig) {
     if (err) {
-      console.log(colors.red('Failed to load plugin\'s configs'));
+      console.log(colors.red("Failed to load plugin's configs"));
       console.log(err);
-      return;
+      return cb(err);
     }
     // sails.config = _.merge(configs, sails.config, (a, b) => _.isArray(a) ? a.concat(b) : undefined)
     // // Using this hack to reset and bind our policies to router
@@ -39,7 +39,9 @@ module.exports = function (sails, dir) {
     // Save final config into sails.config
     sails.config = config;
 
-    console.log('sails.config.policies', sails.config.policies)
-  })
+    console.log("sails.config.policies", sails.config.policies);
+
+    cb(null);
+  });
 };
 
