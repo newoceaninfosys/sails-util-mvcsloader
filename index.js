@@ -58,7 +58,9 @@ module.exports = function(sails) {
           models: __dirname + "/../../api/models",
           controllers: __dirname + "/../../api/controllers",
           services: __dirname + "/../../api/services",
-          helpers: __dirname + "/../../api/helpers"
+          helpers: __dirname + "/../../api/helpers",
+          // config: __dirname + "/../../api/config",
+          // policies: __dirname + "/../../api/policies",
         };
       }
 
@@ -87,7 +89,7 @@ module.exports = function(sails) {
           if (err) {
             return next(err);
           }
-          sails.log.info("User hook models loaded from " + dir.models + ".");
+          sails.log.info("Models are loaded from " + dir.models + ".");
           return next(null);
         });
       };
@@ -98,7 +100,7 @@ module.exports = function(sails) {
             return next(err);
           }
 
-          sails.log.info("User hook controllers loaded from " + dir.controllers + ".");
+          sails.log.info("Controllers are loaded from " + dir.controllers + ".");
 
           return next(null);
         });
@@ -109,7 +111,7 @@ module.exports = function(sails) {
           if (err) {
             return next(err);
           }
-          sails.log.info("User hook services loaded from " + dir.services + ".");
+          sails.log.info("Services are loaded from " + dir.services + ".");
           return next(null);
         });
       };
@@ -119,24 +121,27 @@ module.exports = function(sails) {
           if (err) {
             return next(err);
           }
-          sails.log.info("User hook helpers loaded from " + dir.helpers + ".");
+          sails.log.info("Helpers are loaded from " + dir.helpers + ".");
           return next(null);
         });
       };
 
       let loadPolicies = function(next) {
-        next(null);
-      };
-
-      if (dir.policies) {
-        loadPolicies = function(next) {
+        if (dir.policies) {
           self.injectPolicies(dir.policies, function(error, modules) {
-            loadPoliciesCallBack(error, modules);
-            sails.log.info("User hook policies loaded from " + dir.policies + ".");
-            next(error);
+            if (error) {
+              return next(error);
+            }
+            loadPoliciesCallBack(null, modules);
+            sails.log.info("Policies and Config are loaded from " + dir.policies + ".");
+            return next(null);
           });
-        };
-      }
+        } else {
+          loadPoliciesCallBack(null, []);
+          sails.log.info("Policy configs are loaded");
+          return next(null);
+        }
+      };
 
       let loadConfigs = function(next) {
         next(null);
@@ -145,7 +150,7 @@ module.exports = function(sails) {
       if (dir.config) {
         loadConfigs = function(next) {
           self.injectConfig(dir.config, function(error) {
-            sails.log.info("User hook config loaded from " + dir.config + ".");
+            sails.log.info("Config loaded are from " + dir.config + ".");
             next(error);
           });
         };
@@ -156,7 +161,7 @@ module.exports = function(sails) {
           if (err) {
             return next(err);
           }
-          sails.log.info("User hook views loaded from " + dir.views + ".");
+          sails.log.info("Views are loaded from " + dir.views + ".");
           return next(null);
         });
       };
@@ -167,9 +172,7 @@ module.exports = function(sails) {
         toLoad.push(loadConfigs);
       }
 
-      if (dir.policies) {
-        toLoad.push(loadPolicies);
-      }
+      toLoad.push(loadPolicies);
 
       if (dir.models) {
         toLoad.push(loadModels);
