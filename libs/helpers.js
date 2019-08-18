@@ -14,7 +14,7 @@ module.exports = function (sails, dir, done) {
     filter: /^([^.]+)\.(?:(?!md|txt).)+$/,
     flatten: true,
     keepDirectoryPath: true
-  }, function(err, helperDefs) {
+  }, function (err, helperDefs) {
     if (err) {
       console.log(colors.red('Failed to load plugin\'s helpers'));
       console.log(err);
@@ -28,14 +28,17 @@ module.exports = function (sails, dir, done) {
       _.extend(helperDefs, sails.config.helpers.moduleDefinitions);
     }
 
+    const helperPrefix = "plugins" + "." + dir.split('/').reverse()[1];
+
     try {
       // Loop through each helper def, attempting to build each one as
       // a Callable (a.k.a. "wet machine")
-      _.each(helperDefs, function(helperDef, identity) {
+      _.each(helperDefs, function (helperDef, identity) {
         try {
           // Camel-case every part of the file path, and join with dots
           // e.g. /user-helpers/foo/my-helper => userHelpers.foo.myHelper
           var keyPath = _.map(identity.split('/'), _.camelCase).join('.');
+          keyPath = helperPrefix + "." + keyPath;
 
           // Save _loadedFrom property for debugging purposes.
           // (e.g. `financial/calculate-mortgage-series`)
@@ -54,14 +57,14 @@ module.exports = function (sails, dir, done) {
           // like that is detected, log a warning.
           if (helperDef.files) {
             sails.log.warn(
-              'Ignoring unexpected `files` property in helper definition loaded '+
-              'from '+helperDef._loadedFrom+'.  This feature can only be used '+
+              'Ignoring unexpected `files` property in helper definition loaded ' +
+              'from ' + helperDef._loadedFrom + '.  This feature can only be used ' +
               'by actions, not by helpers!'
             );
           }
           var hasAnyConfusingExitProps = (
             _.isObject(helperDef.exits) &&
-            _.any(helperDef.exits, function(exitDef){
+            _.any(helperDef.exits, function (exitDef) {
               return (
                 _.isObject(exitDef) &&
                 (
@@ -74,9 +77,9 @@ module.exports = function (sails, dir, done) {
           );
           if (hasAnyConfusingExitProps) {
             sails.log.warn(
-              'Ignoring unexpected property in one of the exits of the helper '+
-              'definition loaded from '+helperDef._loadedFrom+'.  Features like '+
-              '`responseType`, `viewTemplatePath`, and `statusCode` can only be '+
+              'Ignoring unexpected property in one of the exits of the helper ' +
+              'definition loaded from ' + helperDef._loadedFrom + '.  Features like ' +
+              '`responseType`, `viewTemplatePath`, and `statusCode` can only be ' +
               'used by actions, not by helpers!'
             );
           }
@@ -102,7 +105,7 @@ module.exports = function (sails, dir, done) {
       // errors through the hook callback, which will cause Sails to halt lifting.
       if (flaverr.taste('E_FAILED_TO_BUILD_CALLABLE', err)) {
         return done(flaverr({
-          message: 'Failed to load helper `' + err.loadedFrom +'` into a Callable!  '+err.message
+          message: 'Failed to load helper `' + err.loadedFrom + '` into a Callable!  ' + err.message
         }, err));
       } else {
         console.log(colors.red('Error occurred while loading plugin\'s helpers'));
