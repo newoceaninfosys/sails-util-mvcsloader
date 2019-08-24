@@ -1,6 +1,6 @@
 const async = require("async");
 
-module.exports = function(sails) {
+module.exports = function(sails, hooker) {
   if (!sails) {
     console.log("Warning! The Sails app injected into sails-util-mvcsloader seems invalid.");
   }
@@ -9,8 +9,8 @@ module.exports = function(sails) {
 
     defaults: {},
 
-    injectPolicies: function(dir, loadPoliciesCallBack) {
-      require(__dirname + "/libs/policies")(sails, dir, loadPoliciesCallBack);
+    injectPolicies: function(dir, cb) {
+      require(__dirname + "/libs/policies")(sails, hooker, dir, cb);
     },
     injectConfig: function(dir, cb) {
       require(__dirname + "/libs/config")(sails, dir, cb);
@@ -37,18 +37,18 @@ module.exports = function(sails) {
     },
 
     // Inject config and policies synchronously into the Sails app
-    configure: function(dir, cb, loadPoliciesCallBack) {
+    configure: function(dir, cb) {
       if (!dir) {
         dir = {
           config: __dirname + "/../../config",
           policies: __dirname + "/../../api/policies"
         };
       }
-      this.injectAll(dir, cb, loadPoliciesCallBack);
+      this.injectAll(dir, cb);
     },
 
     // Inject models, controllers & services asynchronously into the Sails app
-    inject: function(dir, next, loadPoliciesCallBack) {
+    inject: function(dir, next) {
       // No parameters or only a callback (function) as first parameter
       if ((typeof dir === "function" || !dir) && !next) {
         let tmp = next;
@@ -75,10 +75,10 @@ module.exports = function(sails) {
       next = next || function() {
       };
 
-      this.injectAll(dir, next, loadPoliciesCallBack);
+      this.injectAll(dir, next);
     },
 
-    injectAll: function(dir, cb, loadPoliciesCallBack) {
+    injectAll: function(dir, cb) {
       cb = cb || function() {
       };
 
@@ -128,16 +128,14 @@ module.exports = function(sails) {
 
       let loadPolicies = function(next) {
         if (dir.policies) {
-          self.injectPolicies(dir.policies, function(error, modules) {
+          self.injectPolicies(dir.policies, function(error) {
             if (error) {
               return next(error);
             }
-            loadPoliciesCallBack(null, modules);
             sails.log.info("Policies and Config are loaded from " + dir.policies + ".");
             return next(null);
           });
         } else {
-          loadPoliciesCallBack(null, []);
           sails.log.info("Policy configs are loaded");
           return next(null);
         }
