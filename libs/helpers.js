@@ -7,7 +7,7 @@ const flaverr = require('flaverr');
 const includeAll = require('include-all');
 const colors = require('colors');
 
-module.exports = function (sails, dir, done) {
+module.exports = function (sails, dir, options, done) {
   // Load helper defs out of the specified folder
   includeAll.optional({
     dirname: dir,
@@ -20,6 +20,7 @@ module.exports = function (sails, dir, done) {
       console.log(err);
       return done(err);
     }
+    const _options = options || {};
 
     // If any helpers were specified when loading Sails, add those on
     // top of the ones loaded from disk.  (Experimental)
@@ -28,7 +29,13 @@ module.exports = function (sails, dir, done) {
       _.extend(helperDefs, sails.config.helpers.moduleDefinitions);
     }
 
-    const helperPrefix = "plugins" + "." + dir.split('/').reverse()[1];
+    let helperPrefix = "";
+
+    if(typeof _options.prefix === "string") {
+      helperPrefix = _options.prefix;
+    } else if (typeof _options.prefix === "function") {
+      helperPrefix = _options.prefix(dir);
+    }
 
     try {
       // Loop through each helper def, attempting to build each one as

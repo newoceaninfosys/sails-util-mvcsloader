@@ -28,8 +28,8 @@ module.exports = function(sails, hooker) {
       require(__dirname + "/libs/services")(sails, dir, cb);
     },
 
-    injectHelpers: function(dir, cb) {
-      require(__dirname + "/libs/helpers")(sails, dir, cb);
+    injectHelpers: function(dir, options, cb) {
+      require(__dirname + "/libs/helpers")(sails, dir, options, cb);
     },
 
     injectViews: function(dir, cb) {
